@@ -3,7 +3,7 @@ Quick example to help a friend to understand how to mock libraries using gmock ð
 # Motivation
 
 Imagine that your production code use the method `std::chrono::system_lock::now` from `STL`
-And you would like to mock this class to address some business requirmenets such as, increase the code coverage.
+And you would like to mock this class to address some business requirements such as, increase the code coverage.
 
 In this example I show how you can achieve this using `gmock`.
 
@@ -55,6 +55,26 @@ std::chrono::system_clock::time_point std::chrono::system_clock::now() noexcept
 ```
 
 To this work as we expect, we need to define a test program which will describe what the `nowProxy` suppose to do.
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    participant testCode
+    participant productionCode
+    participant real as std::chrono::system_clock::now()
+    participant mock as std::chrono::system_clock::now() ( implementation from time_mock.cpp)
+    participant mockProxy as TimeMock::proxyNow
+    
+    testCode->>testCode: Create TimeMock object and set expecations.
+    testCode->>productionCode: Call method to be tested (printTime).
+    productionCode->>real: Attempt to invoke now.
+    real->>mock: Call it the time_mock.cpp implementation.
+    mock->>mockProxy: Forward the call to mock object.
+    mockProxy->>mockProxy: Call whatever you defined in your test.
+
+```
+
 
 ## The test program
 
